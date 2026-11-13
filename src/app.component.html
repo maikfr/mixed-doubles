@@ -1,0 +1,418 @@
+@if (!projector() && store.fileName()) {
+  <div class="connection-status" [class.connection-problem]="!store.linkedBackup()" role="status">
+    {{ store.fileName() }} ·
+    {{ store.linkedBackup() ? 'Verbunden' : 'Speichern fehlgeschlagen' }}
+    @if (store.linkedBackup()) {
+      <button class="connection-import" type="button" (click)="openProjector()">
+        Turnierübersicht ↗
+      </button>
+      <button
+        class="connection-import secondary"
+        type="button"
+        (click)="closeTournament()"
+        [disabled]="store.closingFile()"
+      >
+        Datei schließen
+      </button>
+    }
+  </div>
+}
+<main [class.projector]="projector()" [appFitProjection]="projector()">
+  @if (projector()) {
+    <div class="projection-layout">
+      <section class="projection-results">
+        @if (!started()) {
+          <section class="card"><p>Noch keine Runden ausgelost.</p></section>
+        }
+        @if (finished()) {
+          <section class="card champion">
+            <h2>Turniersieg: {{ winner() }}</h2>
+          </section>
+        }
+        <div class="projector-rounds">
+          @for (round of projectorRounds(true); track round.games[0].id) {
+            <app-round
+              [games]="round.games"
+              [title]="round.title"
+              [phase]="round.phase"
+              [index]="round.index"
+            />
+          }
+        </div>
+        <div class="projector-history">
+          @for (round of projectorRounds(false); track round.games[0].id) {
+            <details class="card">
+              <summary>{{ round.title }} · abgeschlossen</summary>
+              <app-round
+                [games]="round.games"
+                [title]="round.title"
+                [phase]="round.phase"
+                [index]="round.index"
+                [showTitle]="false"
+              />
+            </details>
+          }
+        </div>
+      </section>
+      <section class="projection-ranking">
+        <p class="projection-legend">
+          <span class="legend-swatch projected-ko"></span> Qualifiziert für das Viertelfinale
+          <span class="legend-swatch projected-tie"></span> Punktzahl und Sätze gleich,
+          Schnick-Schnack-Schnuck entscheidet
+        </p>
+        <div class="rank-grid">
+          @for (gender of genders; track gender) {
+            <section class="card">
+              <h2>{{ genderName(gender) }} · Rangliste</h2>
+              <div class="rank-scroll">
+                <table appFitTable>
+                  <thead>
+                    <tr>
+                      <th>Platz</th>
+                      <th>Name</th>
+                      <th>Sätze</th>
+                      <th>Punktzahl</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (p of players(gender); track p.id; let i = $index) {
+                      <tr
+                        [class.projected-ko]="projectedQualification(p) === 'qualifiziert'"
+                        [class.projected-tie]="projectedQualification(p) === 'gleichstand'"
+                        [class.withdrawn-row]="p.koExcluded"
+                      >
+                        <td>{{ i + 1 }}</td>
+                        <td>
+                          <span [class.ko-withdrawn]="p.koExcluded">{{ p.name }}</span>
+                          @if (p.koExcluded) {
+                            <small> (Verzicht)</small>
+                          }
+                        </td>
+                        <td>{{ p.setsWon }}</td>
+                        <td>
+                          <strong>{{ p.points }}</strong>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          }
+        </div>
+      </section>
+    </div>
+  } @else {
+    @if (store.restoringFile()) {
+      <section class="card"><p>Letzte Turnierdatei wird geöffnet …</p></section>
+    } @else if (!store.linkedBackup()) {
+      <section class="card">
+        <h1>Turnierdatei</h1>
+        <p>
+          Öffne eine vorhandene Turnierdatei oder starte ein neues, leeres Turnier. Jede Änderung
+          wird automatisch gespeichert.
+        </p>
+        <div class="toolbar">
+          <button (click)="openTournament()">Turnierdatei öffnen</button
+          ><button (click)="newTournament()">Neues Turnier anlegen</button>
+          @if (state().players.length) {
+            <button class="secondary" (click)="linkBackup()">
+              Aktuellen Stand in neuer Datei sichern
+            </button>
+          }
+        </div>
+        @if (!canLinkBackup()) {
+          <p class="warning">
+            Bitte Chrome oder Chromium verwenden. Dieser Browser unterstützt keinen direkten
+            Dateizugriff.
+          </p>
+        }
+      </section>
+    } @else {
+      <section [class.card]="!!state().qualified">
+        @if (state().qualified) {
+          <h1>{{ phaseName() }}</h1>
+          <p>
+            {{ state().players.length }} Personen · {{ count('F') }} FLINTA* · {{ count('M') }} Rest
+            · {{ state().group.length }} Runden ausgelost
+          </p>
+        }
+        @if (!state().qualified) {
+          <h1>Gruppenphase</h1>
+          <div class="toolbar">
+            <span
+              class="disabled-hint"
+              [attr.tabindex]="
+                (!started() && !startReady()) || state().group.length >= maxGroupRounds ? 0 : null
+              "
+              [attr.data-hint]="
+                !started() && !startReady()
+                  ? 'Mindestens 16 Personen; Gesamtzahl durch 4 teilbar.'
+                  : state().group.length >= maxGroupRounds
+                    ? 'Die maximale Anzahl von 10 Runden ist erreicht.'
+                    : null
+              "
+              ><button
+                [disabled]="(!started() && !startReady()) || state().group.length >= maxGroupRounds"
+                (click)="drawGroup()"
+              >
+                + Neue Runde
+              </button></span
+            >
+            @if (hasCompletedRound()) {
+              <span
+                class="disabled-hint"
+                [attr.tabindex]="!canQualify() ? 0 : null"
+                [attr.data-hint]="
+                  !canQualify()
+                    ? 'Alle Ergebnisse speichern; mindestens 16 Personen ohne KO-Verzicht nötig.'
+                    : null
+                "
+                ><button [disabled]="!canQualify()" (click)="drawQuarterfinal()">
+                  Viertelfinale auslosen
+                </button></span
+              >
+            }
+          </div>
+        } @else {
+          @if (state().ko.length < 3) {
+            <div class="toolbar">
+              <span
+                class="disabled-hint"
+                [attr.tabindex]="!koReady() ? 0 : null"
+                [attr.data-hint]="
+                  !koReady() ? 'Zuerst alle Ergebnisse der aktuellen KO-Runde speichern.' : null
+                "
+                ><button [disabled]="!koReady()" (click)="drawKo()">
+                  {{ koTitle(state().ko.length) }} auslosen
+                </button></span
+              >
+            </div>
+          }
+          @if (finished()) {
+            <p class="info">
+              <strong>Turniersieg: {{ winner() }}</strong>
+            </p>
+          }
+        }
+      </section>
+      @for (round of projectorRounds(true); track round.games[0].id) {
+        <details class="card" open>
+          <summary>{{ round.title }} · Ergebnisse offen</summary>
+          <app-round
+            [games]="round.games"
+            [title]="round.title"
+            [phase]="round.phase"
+            [index]="round.index"
+            [editable]="true"
+            [showTitle]="false"
+          />
+        </details>
+      }
+      @for (round of projectorRounds(false); track round.games[0].id) {
+        <details class="card">
+          <summary>{{ round.title }} · abgeschlossen</summary>
+          <app-round
+            [games]="round.games"
+            [title]="round.title"
+            [phase]="round.phase"
+            [index]="round.index"
+            [editable]="true"
+            [showTitle]="false"
+          />
+        </details>
+      }
+      @if (!started()) {
+        <section class="card">
+          <h1>Anmeldung</h1>
+          <p class="muted">
+            Die Turnierleitung erfasst alle Namen. Bei einem Ausfall kann der Name des bestehenden
+            Turnierplatzes geändert werden; Punktzahl und Historie bleiben erhalten.
+          </p>
+          <form
+            class="row"
+            (submit)="addPlayer($event, newName.value, newGender.value, newProfessional.checked)"
+          >
+            <input
+              #newName
+              type="text"
+              placeholder="Name"
+              aria-label="Name"
+              maxlength="80"
+              required
+            />
+            <select #newGender aria-label="Geschlecht">
+              <option value="F">FLINTA*</option>
+              <option value="M">Rest</option>
+            </select>
+            <label><input #newProfessional type="checkbox" /> Profi</label>
+            <button type="submit">Person hinzufügen</button>
+          </form>
+        </section>
+      }
+      <section>
+        @if (started()) {
+          <h2>Teilnehmende</h2>
+        }
+        <p class="registration-stats" aria-live="polite">
+          <strong>{{ state().players.length }}</strong> insgesamt
+        </p>
+        <div class="rank-grid">
+          @for (gender of genders; track gender) {
+            <div class="card">
+              <h3>{{ genderName(gender) }}</h3>
+              <p class="group-stats" aria-live="polite">
+                <strong>{{ count(gender) }}</strong> Teilnehmende, davon
+                <strong>{{ professionalCounts()[gender] }}</strong> Profis
+              </p>
+              <div class="table-wrap participants-wrap">
+                <table class="participants-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th aria-label="Speicherstatus"></th>
+                      <th>Profi</th>
+                      <th>KO-Verzicht</th>
+                      <th>Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (p of sortedPlayers(gender); track p.id) {
+                      <tr>
+                        @if (editingId() === p.id) {
+                          <td>
+                            <input
+                              #editName
+                              [value]="p.name"
+                              maxlength="80"
+                              aria-label="Name ändern"
+                              (change)="updatePlayerName(p.id, editName)"
+                            /><select
+                              #editGender
+                              [disabled]="started()"
+                              aria-label="Geschlecht ändern"
+                              (change)="updatePlayerGender(p.id, editGender)"
+                            >
+                              <option value="F" [selected]="p.gender === 'F'">FLINTA*</option>
+                              <option value="M" [selected]="p.gender === 'M'">Rest</option>
+                            </select>
+                          </td>
+                          <td class="participant-save-status" role="status">
+                            @for (
+                              stamp of playerSavedAt().has(p.id)
+                                ? [playerSavedAt().get(p.id)!]
+                                : [];
+                              track stamp
+                            ) {
+                              <span class="row-saved">Gespeichert</span>
+                            }
+                          </td>
+                          <td>
+                            <input
+                              #professionalInput
+                              type="checkbox"
+                              [attr.aria-label]="'Profi: ' + p.name"
+                              [checked]="p.professional"
+                              (change)="setPlayerProfessional(p.id, professionalInput.checked)"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              #excludedInput
+                              type="checkbox"
+                              [attr.aria-label]="'KO-Verzicht: ' + p.name"
+                              [checked]="!!p.koExcluded"
+                              [disabled]="!!state().ko.length"
+                              title="Nach der KO-Auslosung nicht mehr änderbar"
+                              (change)="setKoExcluded(p.id, excludedInput.checked)"
+                            />
+                          </td>
+                          <td class="actions">
+                            <button
+                              aria-label="Bearbeitung schließen"
+                              title="Bearbeitung schließen"
+                              (click)="editingId.set(null)"
+                            >
+                              ➜
+                            </button>
+                          </td>
+                        } @else {
+                          <td>{{ p.name }}</td>
+                          <td class="participant-save-status" role="status">
+                            @for (
+                              stamp of playerSavedAt().has(p.id)
+                                ? [playerSavedAt().get(p.id)!]
+                                : [];
+                              track stamp
+                            ) {
+                              <span class="row-saved">Gespeichert</span>
+                            }
+                          </td>
+                          <td>
+                            <input
+                              #professionalInput
+                              type="checkbox"
+                              [attr.aria-label]="'Profi: ' + p.name"
+                              [checked]="p.professional"
+                              disabled
+                            />
+                          </td>
+                          <td>
+                            <input
+                              #excludedInput
+                              type="checkbox"
+                              [attr.aria-label]="'KO-Verzicht: ' + p.name"
+                              [checked]="!!p.koExcluded"
+                              disabled
+                            />
+                          </td>
+                          <td class="actions">
+                            <button
+                              class="edit-button"
+                              [attr.aria-label]="p.name + ' ändern'"
+                              title="Ändern"
+                              (click)="editingId.set(p.id)"
+                            >
+                              ✎
+                            </button>
+                            @if (!started()) {
+                              <button
+                                class="danger"
+                                [attr.aria-label]="p.name + ' entfernen'"
+                                title="Entfernen"
+                                (click)="deletePlayer(p.id)"
+                              >
+                                🗑
+                              </button>
+                            }
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</main>
+
+@if (store.backupError()) {
+  <div class="toast toast-error" role="alert">
+    <span>{{ store.backupError() }}</span><button
+      type="button"
+      class="toast-close"
+      aria-label="Meldung schließen"
+      (click)="store.backupError.set('')"
+    >
+      ×
+    </button>
+  </div>
+} @else if (message()) {
+  <div class="toast" [class.toast-error]="messageError()" role="status">{{ message() }}</div>
+} @else if (store.notice()) {
+  <div class="toast" role="status">{{ store.notice() }}</div>
+}

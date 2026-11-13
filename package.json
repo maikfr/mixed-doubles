@@ -1,0 +1,39 @@
+{
+  "name": "mixed-doubles-tournament",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "ng build && node scripts/create-offline.mjs",
+    "start": "ng serve --host 127.0.0.1",
+    "test": "npm run test:rules && npm run test:components",
+    "test:rules": "tsc --ignoreConfig src/tournament/index.ts --rootDir src --outDir .tmp-test --module esnext --moduleResolution bundler --target es2022 --experimentalDecorators --skipLibCheck --strict && node tests/tournament.mjs",
+    "test:components": "ng test --watch=false",
+    "lint": "eslint src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint && npm test && npm run build"
+  },
+  "dependencies": {
+    "@angular/common": "22.2.5",
+    "@angular/compiler": "22.2.5",
+    "@angular/core": "22.2.5",
+    "@angular/forms": "22.2.5",
+    "@angular/platform-browser": "22.2.5",
+    "rxjs": "^7.8.2",
+    "zone.js": "^0.16.0"
+  },
+  "devDependencies": {
+    "@angular/build": "22.2.5",
+    "@angular/cli": "22.2.5",
+    "@angular/compiler-cli": "22.2.5",
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "^22.6.0",
+    "eslint": "^10.14.0",
+    "jsdom": "^31.0.1",
+    "prettier": "^3.10.1",
+    "typescript": "~6.0.0",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}

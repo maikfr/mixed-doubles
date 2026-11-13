@@ -1,0 +1,41 @@
+<form
+  class="table-result auto-result"
+  [style.--set-count]="slots().length"
+  (change)="save()"
+  (submit)="$event.preventDefault()"
+>
+  @for (slot of slots(); track slot) {
+    <label class="set" [style.visibility]="slot < visibleSlots() ? 'visible' : 'hidden'">
+      <input
+        type="number"
+        min="0"
+        max="99"
+        inputmode="numeric"
+        [formControl]="form.controls[slot].controls.left"
+        [class.invalid-score]="invalidSlot() === slot"
+        [attr.aria-invalid]="invalidSlot() === slot ? 'true' : null"
+        [attr.aria-label]="'Spiel ' + gameNumber() + ', Satz ' + (slot + 1) + ', Team 1'"
+      />
+      <span>:</span>
+      <input
+        type="number"
+        min="0"
+        max="99"
+        inputmode="numeric"
+        [formControl]="form.controls[slot].controls.right"
+        [class.invalid-score]="invalidSlot() === slot"
+        [attr.aria-invalid]="invalidSlot() === slot ? 'true' : null"
+        [attr.aria-label]="'Spiel ' + gameNumber() + ', Satz ' + (slot + 1) + ', Team 2'"
+      />
+    </label>
+  }
+  <span class="row-save-status" role="status">
+    @if (error(); as message) {
+      <span class="row-error" role="alert">{{ message }}</span>
+    } @else {
+      @for (stamp of savedMarkers(); track stamp) {
+        <span class="row-saved">Gespeichert</span>
+      }
+    }
+  </span>
+</form>
