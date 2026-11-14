@@ -4,7 +4,7 @@ Offline browser app built with Angular and TypeScript. Tournament format and rul
 
 ## Use the app
 
-Use the published GitHub Pages site in Chrome or Chromium.
+Use the app or download the latest version at [maikfr.github.io/mixed-doubles](https://maikfr.github.io/mixed-doubles/) in Chrome or Chromium.
 
 ## Development
 
