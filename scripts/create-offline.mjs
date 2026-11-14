@@ -16,5 +16,7 @@ html = html.replace(
 if (/<script src=|<link rel="stylesheet" href=/.test(html)) {
   throw new Error('Not all Angular assets were embedded.');
 }
+const license = readFileSync(new URL('../LICENSE', import.meta.url), 'utf8');
+html = html.replace(/<!doctype html>/i, (doctype) => `${doctype}\n<!--\n${license}-->`);
 writeFileSync(new URL('../dist/offline.html', import.meta.url), html);
 console.log('Offline browser app: dist/offline.html');
