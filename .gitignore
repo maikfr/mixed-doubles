@@ -5,3 +5,5 @@ dist/
 .idea
 .directory
 examples/
+test-results/
+playwright-report/

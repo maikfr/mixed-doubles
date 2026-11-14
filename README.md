@@ -11,9 +11,11 @@ Use the published GitHub Pages site in Chrome or Chromium.
 Requirements: Node.js (tested with 24.15) and npm.
 
 ```bash
+nvm use         # Select the project's Node.js version when using nvm
 npm ci
 npm start       # Development server
 npm test        # Rules and component tests
+npm run test:e2e # Complete tournament in Chrome (must be installed)
 npm run build   # Compile app under dist/offline.html
 npm run check   # Formatting, linting, tests, and build
 ```

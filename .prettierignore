@@ -4,3 +4,5 @@ dist/
 .tmp-test/
 package-lock.json
 examples/
+test-results/
+playwright-report/

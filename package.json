@@ -1,6 +1,7 @@
 {
   "name": "mixed-doubles-tournament",
   "version": "1.0.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +10,7 @@
     "test": "npm run test:rules && npm run test:components",
     "test:rules": "tsc --ignoreConfig src/tournament/index.ts --rootDir src --outDir .tmp-test --module esnext --moduleResolution bundler --target es2022 --experimentalDecorators --skipLibCheck --strict && node tests/tournament.mjs",
     "test:components": "ng test --watch=false",
+    "test:e2e": "npm run build && playwright test",
     "lint": "eslint src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -28,6 +30,8 @@
     "@angular/cli": "22.2.5",
     "@angular/compiler-cli": "22.2.5",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
     "angular-eslint": "^22.6.0",
     "eslint": "^10.14.0",
     "jsdom": "^31.0.1",
