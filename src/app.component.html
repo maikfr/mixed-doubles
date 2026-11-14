@@ -128,6 +128,19 @@
           </p>
         }
       </section>
+      @if (offlineDownloadAvailable) {
+        <section class="card offline-download">
+          <h2>Für die ausschließliche Offline-Nutzung herunterladen</h2>
+          <p>
+            Die Anwendung kann heruntergeladen und ohne Internet in Chrome oder Chromium geöffnet
+            werden. Alle Turnierdaten bleiben auf diesem Gerät in der Turnierdatei und werden niemals
+            an einen Server gesendet.
+          </p>
+          <a class="download-button" href="offline.html" download="mixed-doubles.html">
+            Anwendung herunterladen
+          </a>
+        </section>
+      }
     } @else {
       <section [class.card]="!!state().qualified">
         @if (state().qualified) {

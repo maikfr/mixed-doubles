@@ -29,6 +29,7 @@ export class AppComponent {
   protected readonly maxGroupRounds = MAX_GROUP_ROUNDS;
   protected readonly state = this.store.state;
   protected readonly projector = signal(location.hash.startsWith('#projector'));
+  protected readonly offlineDownloadAvailable = location.hostname.endsWith('.github.io');
   protected readonly editingId = signal<number | null>(null);
   protected readonly message = signal('');
   protected readonly messageError = signal(false);

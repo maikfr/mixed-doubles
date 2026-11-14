@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 const dir = new URL('../dist/web/browser/', import.meta.url);
@@ -17,7 +17,4 @@ if (/<script src=|<link rel="stylesheet" href=/.test(html)) {
   throw new Error('Not all Angular assets were embedded.');
 }
 writeFileSync(new URL('../dist/offline.html', import.meta.url), html);
-const releaseDir = new URL('../release/', import.meta.url);
-mkdirSync(releaseDir, { recursive: true });
-writeFileSync(new URL('offline.html', releaseDir), html);
-console.log('Offline browser app: dist/offline.html and release/offline.html');
+console.log('Offline browser app: dist/offline.html');

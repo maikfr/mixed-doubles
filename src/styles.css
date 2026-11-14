@@ -215,6 +215,18 @@ button:disabled {
 a {
   color: #17665b;
 }
+.download-button {
+  display: inline-block;
+  border-radius: 9px;
+  padding: 0.65rem 1rem;
+  background: #dbe8e3;
+  color: #173e39;
+  font-weight: 650;
+  text-decoration: none;
+}
+.download-button:hover {
+  background: #c5dad2;
+}
 .card {
   background: white;
   border: 1px solid #dce6df;

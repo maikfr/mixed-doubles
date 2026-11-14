@@ -4,7 +4,7 @@ Offline browser app built with Angular and TypeScript. Tournament format and rul
 
 ## Use the app
 
-Open the GitHub Pages site in Chrome or Chromium, or download [offline.html](release/offline.html) for offline use. Create or open a tournament file; changes are saved automatically.
+Use the published GitHub Pages site in Chrome or Chromium.
 
 ## Development
 
@@ -14,6 +14,6 @@ Requirements: Node.js (tested with 24.15) and npm.
 npm ci
 npm start       # Development server
 npm test        # Rules and component tests
-npm run build   # Updates dist/offline.html and release/offline.html
+npm run build   # Compile app under dist/offline.html
 npm run check   # Formatting, linting, tests, and build
 ```
