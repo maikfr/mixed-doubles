@@ -4,13 +4,7 @@ Offline browser app built with Angular and TypeScript. Tournament format and rul
 
 ## Use the app
 
-**No programming or installation required.**
-
-1. Download and extract the repository.
-2. Open **`release/offline.html`** in Chrome or Chromium.
-3. Create or open a tournament file. Changes are saved to it automatically.
-
-The app works offline without a server. Keep the tournament management view open for live updates to the tournament overview. Tournament data is stored in the selected file; the browser remembers only the file connection.
+Open the GitHub Pages site in Chrome or Chromium, or download [offline.html](release/offline.html) for offline use. Create or open a tournament file; changes are saved automatically.
 
 ## Development
 
@@ -23,5 +17,3 @@ npm test        # Rules and component tests
 npm run build   # Updates dist/offline.html and release/offline.html
 npm run check   # Formatting, linting, tests, and build
 ```
-
-`npm run format` formats the project. Code, technical documentation, comments, and diagnostics use English. The browser interface, user-facing messages, and `HOW_TO_PLAY.md` use German. Tests retain German UI expectations; legacy backup identifiers remain supported for compatibility.
