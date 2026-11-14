@@ -62,8 +62,8 @@
   font-size: 1.1rem;
   margin-bottom: 0.3rem;
 }
-.projector-rounds th,
-.projector-rounds td {
+.projection-results .games-table th,
+.projection-results .games-table td {
   padding: 0.25rem 0.2rem;
   font-size: 0.85rem;
 }
@@ -326,6 +326,9 @@ th:last-child {
 .score {
   color: #17665b;
 }
+.projection-results .score {
+  color: #000;
+}
 .set {
   display: flex;
   gap: 0.3rem;
@@ -348,10 +351,6 @@ th:last-child {
 }
 .projector .card {
   padding: 0.8rem;
-}
-.champion {
-  text-align: center;
-  background: #e0eee6;
 }
 @media (max-width: 800px) {
   .rank-grid {
@@ -419,10 +418,12 @@ table.fit-table {
   vertical-align: super;
 }
 
-body:has(main.projector) {
-  overflow: hidden;
+.projection-ranking-container {
+  position: sticky;
+  top: 0.7rem;
+  min-width: 0;
 }
-main.projector {
+.projection-ranking {
   transform-origin: top left;
 }
 .projector .rank-scroll {

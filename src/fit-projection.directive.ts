@@ -1,9 +1,8 @@
 import type { OnDestroy } from '@angular/core';
-import { Directive, ElementRef, NgZone, afterNextRender, inject, input } from '@angular/core';
+import { Directive, ElementRef, NgZone, afterNextRender, inject } from '@angular/core';
 
-@Directive({ selector: 'main[appFitProjection]', standalone: true })
+@Directive({ selector: 'section[appFitProjection]', standalone: true })
 export class FitProjectionDirective implements OnDestroy {
-  readonly appFitProjection = input(false);
   private readonly element = inject(ElementRef<HTMLElement>).nativeElement;
   private readonly zone = inject(NgZone);
   private resize?: ResizeObserver;
@@ -12,17 +11,17 @@ export class FitProjectionDirective implements OnDestroy {
   private readonly schedule = (): void => {
     cancelAnimationFrame(this.frame);
     this.frame = requestAnimationFrame(() => {
-      if (!this.appFitProjection()) {
-        this.element.style.transform = '';
-        return;
-      }
+      const container = this.element.parentElement;
+      if (!container) return;
       const height = this.element.scrollHeight;
       const width = this.element.scrollWidth;
       if (!height || !width) return;
-      const availableHeight = Math.max(1, window.innerHeight - this.element.offsetTop);
-      const availableWidth = Math.max(1, window.innerWidth - this.element.offsetLeft);
+      const availableHeight = Math.max(1, window.innerHeight - 24);
+      const availableWidth = container.clientWidth;
+      if (!availableWidth) return;
       const scale = Math.min(1, availableHeight / height, availableWidth / width);
       this.element.style.transform = `scale(${scale})`;
+      container.style.height = `${Math.ceil(height * scale)}px`;
     });
   };
 
@@ -34,6 +33,7 @@ export class FitProjectionDirective implements OnDestroy {
     this.zone.runOutsideAngular(() => {
       this.resize = new ResizeObserver(this.schedule);
       this.resize.observe(this.element);
+      if (this.element.parentElement) this.resize.observe(this.element.parentElement);
       this.mutations = new MutationObserver(this.schedule);
       this.mutations.observe(this.element, {
         childList: true,

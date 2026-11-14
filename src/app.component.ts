@@ -68,6 +68,7 @@ export class AppComponent {
     }
     return status;
   });
+  protected readonly qualificationLegend = computed(() => new Set(this.qualification().values()));
   protected readonly roundViews = computed(() => {
     const group: ProjectorRound[] = this.state().group.map((games, index) => ({
       games,

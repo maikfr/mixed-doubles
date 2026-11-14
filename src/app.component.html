@@ -17,17 +17,12 @@
     }
   </div>
 }
-<main [class.projector]="projector()" [appFitProjection]="projector()">
+<main [class.projector]="projector()">
   @if (projector()) {
     <div class="projection-layout">
       <section class="projection-results">
         @if (!started()) {
           <section class="card"><p>Noch keine Runden ausgelost.</p></section>
-        }
-        @if (finished()) {
-          <section class="card champion">
-            <h2>Turniersieg: {{ winner() }}</h2>
-          </section>
         }
         <div class="projector-rounds">
           @for (round of projectorRounds(true); track round.games[0].id) {
@@ -54,53 +49,61 @@
           }
         </div>
       </section>
-      <section class="projection-ranking">
-        <p class="projection-legend">
-          <span class="legend-swatch projected-ko"></span> Qualifiziert für das Viertelfinale
-          <span class="legend-swatch projected-tie"></span> Punktzahl und Sätze gleich,
-          Schnick-Schnack-Schnuck entscheidet
-        </p>
-        <div class="rank-grid">
-          @for (gender of genders; track gender) {
-            <section class="card">
-              <h2>{{ genderName(gender) }} · Rangliste</h2>
-              <div class="rank-scroll">
-                <table appFitTable>
-                  <thead>
-                    <tr>
-                      <th>Platz</th>
-                      <th>Name</th>
-                      <th>Sätze</th>
-                      <th>Punktzahl</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (p of players(gender); track p.id; let i = $index) {
-                      <tr
-                        [class.projected-ko]="projectedQualification(p) === 'qualifiziert'"
-                        [class.projected-tie]="projectedQualification(p) === 'gleichstand'"
-                        [class.withdrawn-row]="p.koExcluded"
-                      >
-                        <td>{{ i + 1 }}</td>
-                        <td>
-                          <span [class.ko-withdrawn]="p.koExcluded">{{ p.name }}</span>
-                          @if (p.koExcluded) {
-                            <small> (Verzicht)</small>
-                          }
-                        </td>
-                        <td>{{ p.setsWon }}</td>
-                        <td>
-                          <strong>{{ p.points }}</strong>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </section>
+      <div class="projection-ranking-container">
+        <section class="projection-ranking" appFitProjection>
+          @if (qualificationLegend().size) {
+            <p class="projection-legend">
+              @if (qualificationLegend().has('qualifiziert')) {
+                <span class="legend-swatch projected-ko"></span> Qualifiziert für das Viertelfinale
+              }
+              @if (qualificationLegend().has('gleichstand')) {
+                <span class="legend-swatch projected-tie"></span> Punktzahl und Sätze gleich,
+                Schnick-Schnack-Schnuck entscheidet
+              }
+            </p>
           }
-        </div>
-      </section>
+          <div class="rank-grid">
+            @for (gender of genders; track gender) {
+              <section class="card">
+                <h2>{{ genderName(gender) }} · Rangliste</h2>
+                <div class="rank-scroll">
+                  <table appFitTable>
+                    <thead>
+                      <tr>
+                        <th>Platz</th>
+                        <th>Name</th>
+                        <th>Sätze</th>
+                        <th>Punktzahl</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of players(gender); track p.id; let i = $index) {
+                        <tr
+                          [class.projected-ko]="projectedQualification(p) === 'qualifiziert'"
+                          [class.projected-tie]="projectedQualification(p) === 'gleichstand'"
+                          [class.withdrawn-row]="p.koExcluded"
+                        >
+                          <td>{{ i + 1 }}</td>
+                          <td>
+                            <span [class.ko-withdrawn]="p.koExcluded">{{ p.name }}</span>
+                            @if (p.koExcluded) {
+                              <small> (Verzicht)</small>
+                            }
+                          </td>
+                          <td>{{ p.setsWon }}</td>
+                          <td>
+                            <strong>{{ p.points }}</strong>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            }
+          </div>
+        </section>
+      </div>
     </div>
   } @else {
     @if (store.restoringFile()) {
@@ -133,8 +136,8 @@
           <h2>Für die ausschließliche Offline-Nutzung herunterladen</h2>
           <p>
             Die Anwendung kann heruntergeladen und ohne Internet in Chrome oder Chromium geöffnet
-            werden. Alle Turnierdaten bleiben auf diesem Gerät in der Turnierdatei und werden niemals
-            an einen Server gesendet.
+            werden. Alle Turnierdaten bleiben auf diesem Gerät in der Turnierdatei und werden
+            niemals an einen Server gesendet.
           </p>
           <a class="download-button" href="offline.html" download="mixed-doubles.html">
             Anwendung herunterladen
