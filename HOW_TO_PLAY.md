@@ -7,6 +7,7 @@
   - Für jede Runde werden neue Doppelteams und Begegnungen ausgelost.
   - In der Gruppenphase dürfen alle miteinander, also gruppenübergreifend, ein Doppelteam bilden.
   - In der KO-Phase werden nach Möglichkeit nur Mixed-Doppel (eine Person jeder Gruppe) gebildet.
+  - Ein Doppel mit zwei Profis spielt nach Möglichkeit nicht gegen ein Doppel ohne Profi.
   - Bevorzugt werden Personen zusammengelost, die noch nicht zusammen gespielt haben.
   - Personen mit Profi-Kennzeichnung spielen bevorzugt in verschiedenen Doppelteams und nicht zusammen.
   - Spielt in einem Doppelteam eine Person mit Profi-Kennzeichnung, wird auch im gegnerischen Doppelteam eine so gekennzeichnete Person bevorzugt – auch wenn sich dadurch frühere Begegnungen wiederholen.

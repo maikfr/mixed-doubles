@@ -105,6 +105,50 @@ for (let i = 0; i < 3; i++) {
   }
 }
 
+// The final must split professionals even when that requires both teams to repeat.
+const finalRegression = await newStore();
+for (const [name, gender, professional] of [
+  ['Anna', 'F', true],
+  ['Bernd', 'M', true],
+  ['Oliver', 'M', false],
+  ['Ulrike', 'F', false],
+  ['Extra A', 'F', false],
+  ['Extra B', 'M', false],
+])
+  finalRegression.addPlayer(name, gender, professional);
+const finalState = structuredClone(finalRegression.state());
+const [anna, bernd, oliver, ulrike, extraA, extraB] = finalState.players.map((p) => p.id);
+finalState.ko = [
+  [
+    {
+      id: 100,
+      teams: [
+        [anna, bernd],
+        [extraA, extraB],
+      ],
+      sets: [],
+    },
+  ],
+  [
+    {
+      id: 101,
+      teams: [
+        [anna, oliver],
+        [bernd, ulrike],
+      ],
+      sets: [],
+    },
+  ],
+];
+const finalGame = draw(finalState, [anna, bernd, oliver, ulrike], 'ko')[0];
+assert.deepEqual(
+  finalGame.teams.map(
+    (team) => team.filter((id) => finalState.players.find((p) => p.id === id).professional).length,
+  ),
+  [1, 1],
+  'A professional-only team should not face a team without professionals when avoidable',
+);
+
 for (const professionalCount of [1, 4]) {
   const balanced = await newStore();
   for (let i = 0; i < 16; i++)
